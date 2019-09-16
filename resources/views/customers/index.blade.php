@@ -23,4 +23,10 @@
             <div class="col-2">{{$customer->active}}</div>
         </div>
     @endforeach
-    @endsection
+
+    <div class="row">
+        <div class="col-12 text-center d-flex justify-content-center pt-4">
+            {{$customers->links()}}
+        </div>
+    </div>
+@endsection
