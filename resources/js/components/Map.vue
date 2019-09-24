@@ -12,18 +12,43 @@
             </b-form>
         </div>
 
+       <!-- <div class="top-viewed layers-list ">
+            <div class="mt-2 mr-2 ml-2 mb-2">
+                <b-form-checkbox v-model="statusF1"
+                                 @change="onAddFields1">
+                    Границы зарегистрированных земельных участков
+                </b-form-checkbox>
+                <b-form-checkbox v-model="statusF2"
+                                 @change="onAddFields2">
+                    Границы элементарных участков
+                </b-form-checkbox>
+                <b-form-checkbox v-model="statusF3"
+                                 @change="onAddFields3">
+                    Границы участков хозяйств
+                </b-form-checkbox>
+            </div>
 
-        <b-modal ref="poly-modal" hide-footer title="Инструкция" id="modal-1">
+
+
+        </div> -->
+
+
+        <!--<b-modal ref="poly-modal" hide-footer title="Инструкция" id="modal-1">
             <p class="my-4">
                 Для создания нового участка нажмите кнопку "Создать", для изменения
             существующего участка нажмите "Изменить" и далее кликните на существующее поле.
             </p>
             <b-button class="mt-3" variant="outline-info" @click="createField">Создать</b-button>
             <b-button class="mt-3" variant="outline-info" @click="hideModal">Изменить</b-button>
-        </b-modal>
+        </b-modal> -->
 
-        <RightMenu v-if="addNewField"></RightMenu>
+        <RightMenu v-if="this.$parent.addField"></RightMenu>
         <FieldData v-if="polyPopup" :poly="polyCharacteristic"></FieldData>
+
+       <!-- <FilterBaseField v-if="statusF1"></FilterBaseField>
+        <FilterElemField v-if="statusF2"></FilterElemField>
+        <FilterCultureField v-if="statusF3"></FilterCultureField> -->
+
 
     </div>
 
@@ -37,7 +62,7 @@
 <script>
 import L from  'leaflet'
 import 'leaflet-draw'
-//import L1 from
+
 import Pagination from "bootstrap-vue/esm/mixins/pagination";
 
     export default {
@@ -55,6 +80,16 @@ import Pagination from "bootstrap-vue/esm/mixins/pagination";
                 addNewField: false,
                 polyCharacteristic: null,
                 polyPopup: false,
+
+                // flags for filters
+                baseFieldChosen: false,
+                elemFieldChosen: false,
+                cultureFieldChosen: false,
+
+
+                statusF1: false,
+                statusF2: false,
+                statusF3: false,
 
                 elementsFromDB:[                //тут будут данные
                     {
@@ -80,6 +115,42 @@ import Pagination from "bootstrap-vue/esm/mixins/pagination";
 
         },
         methods: {
+            onAddFields3(){
+                if(this.statusF3 === false){
+                    console.log('3-checked');
+                    this.growingCulturesLayer.addTo(this.map);
+                }
+                else{
+                    console.log('3-unchecked');
+                    this.map.removeLayer(this.growingCulturesLayer);
+                }
+
+            },
+            onAddFields2() {
+                if(this.statusF2 === false){
+                    console.log('2-checked');
+                    this.elFieldsLayer.addTo(this.map);
+                }
+                else{
+                    console.log('2-unchecked');
+                    this.map.removeLayer(this.elFieldsLayer);
+                }
+
+            },
+            onAddFields1() {
+                if(this.statusF1 === false){
+                    console.log('1-checked');
+                    this.fieldsLayer.addTo(this.map);
+                }
+                else{
+                    console.log('1-unchecked');
+                    this.map.removeLayer(this.fieldsLayer);
+                }
+
+            },
+
+
+
             getMapLayer(dataArr, layerId) {
                 var cont = this;
                 var squaresArr = [];
@@ -117,9 +188,10 @@ import Pagination from "bootstrap-vue/esm/mixins/pagination";
                 }
                 return newLayer;
             },
-            hideModal() {
+           /* hideModal() {
                 this.$refs['poly-modal'].hide();
             },
+            */
             onPolygonClicked(e){
                 console.log('Clicked',e.target.options.data);
                 this.polyPopup = true;
@@ -129,7 +201,7 @@ import Pagination from "bootstrap-vue/esm/mixins/pagination";
 
 
             createField() {
-                this.$refs['poly-modal'].hide();
+                //this.$refs['poly-modal'].hide();
 
                 var drawnLayers = new L.FeatureGroup();
                 this.map.addLayer(drawnLayers);
@@ -165,12 +237,10 @@ import Pagination from "bootstrap-vue/esm/mixins/pagination";
                 this.map.on('draw:created', function(e) {
                     var type = e.layerType,
                         layer = e.layer;
-
-                    //if (type === 'marker') {
-                    //    layer.bindPopup('A popup!');
-                    //}
-
                     drawnLayers.addLayer(layer);
+
+                    console.log('new field params', layer._latlngs);
+
 
                 });
 
@@ -182,6 +252,11 @@ import Pagination from "bootstrap-vue/esm/mixins/pagination";
         },
         mounted() {
 
+            // карта типа спутник
+            var Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+            });
+
+            /*
             // просто карта
             this.mainLayer = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiZGFyeWFjaHlydWsiLCJhIjoiY2swbzEwNnlrMDViYzNrcXI4NDAyN2gyNiJ9.d5mwHr6_wkJRtV0aXZv7Mg',
                 {
@@ -190,21 +265,21 @@ import Pagination from "bootstrap-vue/esm/mixins/pagination";
                 accessToken: 'pk.eyJ1IjoiZGFyeWFjaHlydWsiLCJhIjoiY2swbzEwNnlrMDViYzNrcXI4NDAyN2gyNiJ9.d5mwHr6_wkJRtV0aXZv7Mg'
             });
 
-            // карта типа спутник
-            var Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-                });
-
             //названия на карте
             var CartoDB_VoyagerOnlyLabels = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png', {
                 subdomains: 'abcd',
                 maxZoom: 19
             });
 
+
+
             // базовые карты для выбора
+
             var baseMaps = {
                 "Basic": this.mainLayer,
                 "Satellite": Esri_WorldImagery
             };
+            */
 
             //кастомный слой 1
             this.elFieldsLayer = this.getMapLayer(this.elementsFromDB,1);
@@ -213,21 +288,27 @@ import Pagination from "bootstrap-vue/esm/mixins/pagination";
             //кастомный слой 3
             this.growingCulturesLayer = this.getMapLayer(this.elementsFromDB,3);
 
-            var overlayMaps = {
+            /*var overlayMaps = {
                 "Поля": this.fieldsLayer,
                 "Элементарные участки": this.elFieldsLayer,
                 "Поля для хозяев (вручную)": this.growingCulturesLayer
             };
+            */
 
             // initialize the map
             this.map = L.map('map', {
                 center: [53.54, 27.30],
                 zoom: 8,
                 // тут добавляем все нужные слои
-                layers: [Esri_WorldImagery, CartoDB_VoyagerOnlyLabels, this.elFieldsLayer]
+                layers: [Esri_WorldImagery]
             });
-            L.control.layers(baseMaps, overlayMaps).addTo(this.map);
-        }
+            //L.control.layers(baseMaps).addTo(this.map);
+
+
+        },
+
+
+
     }
 </script>
 
@@ -271,6 +352,14 @@ import Pagination from "bootstrap-vue/esm/mixins/pagination";
     #mapid {
         height: 100%;
         width: 100%;
+    }
+
+    .layers-list{
+        top: 60px;
+        right: 10px;
+        position: absolute;
+        background: white;
+        border-radius: 5px;
     }
 
 </style>

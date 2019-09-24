@@ -10,6 +10,10 @@ Vue.component('my-button', require('./components/MyButton.vue').default);
 Vue.component('RightMenu', require('./components/RightMenu.vue').default);
 Vue.component('FieldData', require('./components/FieldData.vue').default);
 
+Vue.component('FilterBaseField', require('./components/FilterBaseField.vue').default);
+Vue.component('FilterElemField', require('./components/FilterElemField.vue').default);
+Vue.component('FilterCultureField', require('./components/FilterCultureField.vue').default);
+
 const app = new Vue({
     el: '#app',
     components: {

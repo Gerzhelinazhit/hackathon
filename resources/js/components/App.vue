@@ -7,28 +7,25 @@
 
             <b-collapse id="nav-collapse" is-nav>
                 <b-navbar-nav>
-                    <b-nav-item href="#">Что-то</b-nav-item>
-                    <b-nav-item href="#">Что-то еще</b-nav-item>
+                    <b-nav-item href="#">Список хозяйств</b-nav-item>
+                    <b-nav-item-dropdown right>
+                        <!-- Using 'button-content' slot -->
+                        <template  v-slot:button-content>
+                            <em>Справочники</em>
+                        </template>
+                        <b-dropdown-item href="#">Сотрудники</b-dropdown-item>
+                        <b-dropdown-item href="#">Техника</b-dropdown-item>
+                        <b-dropdown-item href="#">Удобрения</b-dropdown-item>
+                    </b-nav-item-dropdown>
                 </b-navbar-nav>
 
                 <!-- Right aligned nav items -->
                 <b-navbar-nav class="ml-auto">
-                    <b-nav-item v-b-modal.Map.modal-1 @click="onStartConstructor">Конструктор полей</b-nav-item>
+                    <b-nav-item  @click="onStartConstructor">Добавить поле</b-nav-item>
 
-                    <b-nav-item-dropdown text="Тип отображения" right>
-                        <b-dropdown-item>
-                            Карта полей
-                        </b-dropdown-item>
+                    <b-nav-item>Хозяйство</b-nav-item>
 
-                        <b-dropdown-item>
-                            Элементарные участки
-                        </b-dropdown-item>
 
-                        <b-dropdown-item>
-                            Поля по типу посевов
-                        </b-dropdown-item>
-
-                    </b-nav-item-dropdown>
 
                     <b-nav-item-dropdown right>
                         <!-- Using 'button-content' slot -->
@@ -56,7 +53,7 @@
         name: 'App',
         data(){
             return{
-                startConstructor: false,
+                addField: false,
             }
         },
         mounted(){
@@ -65,7 +62,8 @@
         },
         methods: {
             onStartConstructor(){
-                this.startConstructor = true;
+                this.addField = !this.addField;
+
             }
 
         }
