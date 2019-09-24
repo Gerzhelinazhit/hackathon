@@ -12,7 +12,7 @@
             </b-form>
         </div>
 
-       <!-- <div class="top-viewed layers-list ">
+        <div class="top-viewed layers-list" v-if="!this.$parent.addField">
             <div class="mt-2 mr-2 ml-2 mb-2">
                 <b-form-checkbox v-model="statusF1"
                                  @change="onAddFields1">
@@ -30,7 +30,7 @@
 
 
 
-        </div> -->
+        </div>
 
 
         <!--<b-modal ref="poly-modal" hide-footer title="Инструкция" id="modal-1">

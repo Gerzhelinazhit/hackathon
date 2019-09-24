@@ -7,15 +7,34 @@
 
             <b-collapse id="nav-collapse" is-nav>
                 <b-navbar-nav>
-                    <b-nav-item href="#">Список хозяйств</b-nav-item>
+                    <b-nav-item>Список хозяйств</b-nav-item>
+                    <b-nav-item>
+                        <router-link to="/home">
+                            Карта
+                        </router-link>
+
+                    </b-nav-item>
+
                     <b-nav-item-dropdown right>
                         <!-- Using 'button-content' slot -->
                         <template  v-slot:button-content>
                             <em>Справочники</em>
                         </template>
-                        <b-dropdown-item href="#">Сотрудники</b-dropdown-item>
-                        <b-dropdown-item href="#">Техника</b-dropdown-item>
-                        <b-dropdown-item href="#">Удобрения</b-dropdown-item>
+                        <b-dropdown-item>
+                            <router-link to="/workers">
+                                Сотрудники
+                            </router-link>
+                        </b-dropdown-item>
+                        <b-dropdown-item>
+                            <router-link to="/technics">
+                                Техника
+                            </router-link>
+                        </b-dropdown-item>
+                        <b-dropdown-item>
+                            <router-link to="/manures">
+                                Удобрения
+                            </router-link>
+                        </b-dropdown-item>
                     </b-nav-item-dropdown>
                 </b-navbar-nav>
 
@@ -23,7 +42,11 @@
                 <b-navbar-nav class="ml-auto">
                     <b-nav-item  @click="onStartConstructor">Добавить поле</b-nav-item>
 
-                    <b-nav-item>Хозяйство</b-nav-item>
+                    <b-nav-item>
+                        <router-link to="/farm">
+                            Хозяйство
+                        </router-link>
+                    </b-nav-item>
 
 
 

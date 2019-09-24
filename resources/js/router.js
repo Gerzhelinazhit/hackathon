@@ -4,6 +4,14 @@ import Component1 from './components/Component1';
 import Component2 from './components/Component2';
 import Component3 from './components/Component3';
 import Map from './components/Map';
+
+import ManuresList from './components/ManuresList';
+import TechnicksList from './components/TechnicksList';
+import WorkersList from './components/WorkersList';
+import Farm from './components/Farm';
+
+
+
 Vue.use(VueRouter);
 
 export default new VueRouter({
@@ -23,6 +31,22 @@ export default new VueRouter({
         {
             path: '/c3',
             component: Component3
+        },
+        {
+            path: '/manures',
+            component: ManuresList
+        },
+        {
+            path: '/technics',
+            component: TechnicksList
+        },
+        {
+            path: '/workers',
+            component: WorkersList
+        },
+        {
+            path: '/farm',
+            component: Farm
         }
 
     ],

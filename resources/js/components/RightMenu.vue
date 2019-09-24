@@ -86,6 +86,8 @@
         data() {
             return {
                 show: false,
+                drawControl: null,
+                newPolygon: null,
                 form: {
                     name: '',
                     place: '',
@@ -130,30 +132,26 @@
                 }
             };
 
-            var drawControl = new L.Control.Draw(drawPluginOptions);
-            this.$parent.map.addControl(drawControl);
+            this.drawControl = new L.Control.Draw(drawPluginOptions);
+            this.$parent.map.addControl(this.drawControl);
 
             this.$parent.map.on('draw:created', function(e) {
-                var type = e.layerType,
-                    layer = e.layer;
-                drawnLayers.addLayer(layer);
+                var type = e.layerType;
+                this.newPolygon = e.layer;
+                drawnLayers.addLayer(this.newPolygon);
 
-                console.log('new field params', layer._latlngs);
-
+                console.log('new field params', this.newPolygon._latlngs);
 
             });
-
-
             console.log('hi', drawnLayers.valueOf());
-
-
-
         },
         methods: {
             onSubmit(evt) {
                 evt.preventDefault();
                 alert(JSON.stringify(this.form));// here add to server
-                Map.addNewField = false;
+                //alert(this.newPolygon._latlngs);
+                this.$parent.$parent.addField = false;
+                this.$parent.map.removeControl(this.drawControl);
             },
             onReset(evt) {
                 evt.preventDefault();
@@ -171,10 +169,12 @@
                     this.show = true
                 });
 
-                console.log(this.$parent.addNewField);
+                console.log(this.$parent.$parent.addField);
 
-                this.$parent.addNewField = false;
-                console.log(this.$parent.addNewField);
+                this.$parent.$parent.addField = false;
+                console.log(this.$parent.$parent.addField);
+
+                this.$parent.map.removeControl(this.drawControl);
             }
         }
     }
@@ -183,7 +183,7 @@
 <style scoped>
     .right-menu {
         position: absolute;
-        z-index: 1000;
+        z-index: 10;
         top: 180px;
         right: 10px;
         background-color: white;
@@ -193,7 +193,7 @@
     }
     .constructor-menu{
         position: absolute;
-        z-index: 1000;
+        z-index: 10;
         top: 67px;
         right: 45px;
         background-color: white;
