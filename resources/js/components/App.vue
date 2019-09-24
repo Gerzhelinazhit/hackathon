@@ -1,6 +1,6 @@
 <template>
     <div id="main-container">
-        <b-navbar toggleable="lg" type="dark" variant="info">
+        <b-navbar toggleable="lg" type="dark" variant="info" class="top-viewed">
             <b-navbar-brand>AgroNET</b-navbar-brand>
 
             <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
@@ -13,6 +13,7 @@
 
                 <!-- Right aligned nav items -->
                 <b-navbar-nav class="ml-auto">
+                    <b-nav-item v-b-modal.Map.modal-1 @click="onStartConstructor">Конструктор полей</b-nav-item>
 
                     <b-nav-item-dropdown text="Тип отображения" right>
                         <b-dropdown-item>
@@ -44,10 +45,6 @@
         <router-view></router-view>
 
 
-        <div id="mapid"></div>
-
-
-
     </div>
 
 
@@ -58,13 +55,18 @@
     export default {
         name: 'App',
         data(){
-            return{}
+            return{
+                startConstructor: false,
+            }
         },
         mounted(){
 
 
         },
         methods: {
+            onStartConstructor(){
+                this.startConstructor = true;
+            }
 
         }
     }
@@ -87,10 +89,9 @@
         width: 100%;
     }
 
-    #mapid {
 
-        height: 100%;
-        width: 100%;
+    .top-viewed{
+        z-index: 100;
     }
 
 </style>

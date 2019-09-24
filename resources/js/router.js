@@ -9,7 +9,7 @@ Vue.use(VueRouter);
 export default new VueRouter({
     routes: [
         {
-            path: '/',
+            path: '/home',
             component: Map
         },
         {

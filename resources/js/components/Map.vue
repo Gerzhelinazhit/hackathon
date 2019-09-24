@@ -1,28 +1,232 @@
 <template>
+    <div id="mapid">
+        <div id="map">
+            <b-form class="form-custom pos-tr">
+                <div class="mt-1"><strong>Select a type of growing plant:</strong></div>
+                <b-form-select
+                    v-model="selected"
+                    :options="options"
+                    size="sm"
+                    class="mb-1">
+                </b-form-select>
+            </b-form>
+        </div>
 
-    <div id="map">
-        <h1>Here will be leaflet map</h1>
+
+        <b-modal ref="poly-modal" hide-footer title="Инструкция" id="modal-1">
+            <p class="my-4">
+                Для создания нового участка нажмите кнопку "Создать", для изменения
+            существующего участка нажмите "Изменить" и далее кликните на существующее поле.
+            </p>
+            <b-button class="mt-3" variant="outline-info" @click="createField">Создать</b-button>
+            <b-button class="mt-3" variant="outline-info" @click="hideModal">Изменить</b-button>
+        </b-modal>
+
+        <RightMenu v-if="addNewField"></RightMenu>
+        <FieldData v-if="polyPopup" :poly="polyCharacteristic"></FieldData>
+
     </div>
+
 </template>
+
+
+
+
+
 
 <script>
 import L from  'leaflet'
+import 'leaflet-draw'
+//import L1 from
+import Pagination from "bootstrap-vue/esm/mixins/pagination";
 
     export default {
         name: "Map",
-        mounted() {
-            // initialize the map
-            var map = L.map('map').setView([53.54, 27.30], 8);
+        components: {Pagination},
+        data() {
+            return{
+                map: null,
+                fieldsLayer: null,
+                elFieldsLayer: null,
+                growingCulturesLayer: null,
+                mainLayer: null,
+                selected: null,
+                options: [],
+                addNewField: false,
+                polyCharacteristic: null,
+                polyPopup: false,
 
-            // load a tile layer
-            L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiZGFyeWFjaHlydWsiLCJhIjoiY2swbzEwNnlrMDViYzNrcXI4NDAyN2gyNiJ9.d5mwHr6_wkJRtV0aXZv7Mg', {
-                attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+                elementsFromDB:[                //тут будут данные
+                    {
+                        id:1,
+                        points: [[52.509, 27.31],
+                            [52.503, 27.04],
+                            [52.51, 27.44]]
+                    },
+                    {
+                        id:2,
+                        points: [[52.529, 27.41],
+                            [52.523, 27.44],
+                            [52.521, 27.64]]
+                    },
+                    {
+                        id:3,
+                        points: [[52.569, 27.61],
+                            [52.563, 27.74],
+                            [52.561, 27.94]]
+                    }
+                ]
+            }
+
+        },
+        methods: {
+            getMapLayer(dataArr, layerId) {
+                var cont = this;
+                var squaresArr = [];
+                var nLayer = null;
+
+
+                if (layerId == 1){
+                    nLayer = this.addPolyToLayer(dataArr, 'red')
+                }
+                if (layerId == 2){
+                    nLayer = this.addPolyToLayer(dataArr, 'green')
+                }
+                if (layerId == 3){
+                    nLayer = this.addPolyToLayer(dataArr, 'blue')
+                }
+                return nLayer;
+            },
+            addPolyToLayer(dataArr, layerColor){
+                var cntr = 0;
+                var newLayer = new L.FeatureGroup();
+                for(cntr; cntr<dataArr.length; cntr++) {
+
+                    var polygon = L.polygon(dataArr[cntr].points, {
+                        color: layerColor,
+                        fillColor: layerColor,
+                        fillOpacity: 0.5,
+                        //id: dataArr[cntr].id,
+                        data: dataArr[cntr]
+                    });
+                   // var text = "Я полигон с id=" + dataArr[cntr].id ;
+
+                   // polygon.bindPopup(text);
+                    polygon.on('click', this.onPolygonClicked);
+                    newLayer.addLayer(polygon);
+                }
+                return newLayer;
+            },
+            hideModal() {
+                this.$refs['poly-modal'].hide();
+            },
+            onPolygonClicked(e){
+                console.log('Clicked',e.target.options.data);
+                this.polyPopup = true;
+                this.polyCharacteristic = e.target.options.data;
+
+            },
+
+
+            createField() {
+                this.$refs['poly-modal'].hide();
+
+                var drawnLayers = new L.FeatureGroup();
+                this.map.addLayer(drawnLayers);
+
+                var drawPluginOptions = {
+                    position: 'topright',
+                    draw: {
+                        polygon: {
+                            allowIntersection: false, // Restricts shapes to simple polygons
+                            drawError: {
+                                color: '#e1e100', // Color the shape will turn when intersects
+                                message: '<strong>Oh snap!<strong> you can\'t draw that!' // Message that will show when intersect
+                            },
+                            shapeOptions: {
+                                color: '#97009c'
+                            }
+                        },
+                        // disable toolbar item by setting it to false
+                        polyline: false,
+                        circle: false, // Turns off this drawing tool
+                        rectangle: false,
+                        marker: false,
+                    },
+                    edit: {
+                        featureGroup: drawnLayers, //REQUIRED!!
+                        remove: false
+                    }
+                };
+
+                var drawControl = new L.Control.Draw(drawPluginOptions);
+                this.map.addControl(drawControl);
+
+                this.map.on('draw:created', function(e) {
+                    var type = e.layerType,
+                        layer = e.layer;
+
+                    //if (type === 'marker') {
+                    //    layer.bindPopup('A popup!');
+                    //}
+
+                    drawnLayers.addLayer(layer);
+
+                });
+
+
+                console.log('hi', drawnLayers.valueOf());
+                this.addNewField = true;
+
+            }
+        },
+        mounted() {
+
+            // просто карта
+            this.mainLayer = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiZGFyeWFjaHlydWsiLCJhIjoiY2swbzEwNnlrMDViYzNrcXI4NDAyN2gyNiJ9.d5mwHr6_wkJRtV0aXZv7Mg',
+                {
                 maxZoom: 18,
                 id: 'mapbox.streets',
                 accessToken: 'pk.eyJ1IjoiZGFyeWFjaHlydWsiLCJhIjoiY2swbzEwNnlrMDViYzNrcXI4NDAyN2gyNiJ9.d5mwHr6_wkJRtV0aXZv7Mg'
-            }).addTo(map);
+            });
 
+            // карта типа спутник
+            var Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                });
 
+            //названия на карте
+            var CartoDB_VoyagerOnlyLabels = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png', {
+                subdomains: 'abcd',
+                maxZoom: 19
+            });
+
+            // базовые карты для выбора
+            var baseMaps = {
+                "Basic": this.mainLayer,
+                "Satellite": Esri_WorldImagery
+            };
+
+            //кастомный слой 1
+            this.elFieldsLayer = this.getMapLayer(this.elementsFromDB,1);
+            //кастомный слой 2
+            this.fieldsLayer = this.getMapLayer(this.elementsFromDB,2);
+            //кастомный слой 3
+            this.growingCulturesLayer = this.getMapLayer(this.elementsFromDB,3);
+
+            var overlayMaps = {
+                "Поля": this.fieldsLayer,
+                "Элементарные участки": this.elFieldsLayer,
+                "Поля для хозяев (вручную)": this.growingCulturesLayer
+            };
+
+            // initialize the map
+            this.map = L.map('map', {
+                center: [53.54, 27.30],
+                zoom: 8,
+                // тут добавляем все нужные слои
+                layers: [Esri_WorldImagery, CartoDB_VoyagerOnlyLabels, this.elFieldsLayer]
+            });
+            L.control.layers(baseMaps, overlayMaps).addTo(this.map);
         }
     }
 </script>
@@ -44,7 +248,29 @@ import L from  'leaflet'
     }
 
     #map {
+        height: calc(100% - 55px);
+        z-index: 0
+
+    }
+    .form-custom {
+        position: absolute;
+
+        width: 260px;
+        background-color: white;
+        border-radius: 5px;
+
+    }
+    .pos-tr{
+        top: 10px;
+        right: 100px;
+    }
+    .pos-br{
+        bottom: 10px;
+        right: 100px;
+    }
+    #mapid {
         height: 100%;
+        width: 100%;
     }
 
 </style>
