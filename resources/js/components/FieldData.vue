@@ -52,6 +52,11 @@
             onChangePolygon(){
                 console.log('change event');
                 this.$parent.polyPopup = false;
+            },
+            onInfoPolygon() {
+                console.log('подробнее event');
+                this.$parent.polyPopup = false;
+
             }
         }
     }

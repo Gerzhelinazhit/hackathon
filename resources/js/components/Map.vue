@@ -272,6 +272,7 @@ import Pagination from "bootstrap-vue/esm/mixins/pagination";
 
             // карта типа спутник
             var Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                maxZoom: 16,
             });
 
             /*

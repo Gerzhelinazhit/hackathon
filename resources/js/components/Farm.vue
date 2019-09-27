@@ -50,32 +50,32 @@
                                                 <b-tr>
                                                     <b-th colspan="1"></b-th>
                                                     <b-th variant="primary">
-                                                        <b-button v-b-modal.bv-modal-example @click="createChart">
+                                                        <b-button @click="createChart('pH 2018', [1,34,5,6,7,8,9])">
                                                             Гр
                                                         </b-button>
                                                     </b-th>
                                                     <b-th variant="primary">
-                                                        <b-button>
+                                                        <b-button @click="createChart('гумус 2018', [1,8,7,8,9])">
                                                             Гр
                                                         </b-button>
                                                     </b-th>
                                                     <b-th variant="primary">
-                                                        <b-button>
+                                                        <b-button @click="createChart('CaO 2018', [1,8,7,8,9])">
                                                             Гр
                                                         </b-button>
                                                     </b-th>
                                                     <b-th variant="primary">
-                                                        <b-button>
+                                                        <b-button @click="createChart('P2O5 2018', [1,8,7,8,9])">
                                                             Гр
                                                         </b-button>
                                                     </b-th>
                                                     <b-th variant="primary">
-                                                        <b-button>
+                                                        <b-button @click="createChart('K2O 2018', [1,8,7,8,9])">
                                                             Гр
                                                         </b-button>
                                                     </b-th>
                                                     <b-th variant="primary">
-                                                        <b-button>
+                                                        <b-button @click="createChart('Mg 2018', [1,8,7,8,9])">
                                                             Гр
                                                         </b-button>
                                                     </b-th>
@@ -157,10 +157,13 @@
 
 
         </b-card>
-        <canvas id="myChart"></canvas>
-        <b-modal id="bv-modal-example" >
 
-
+        <b-modal id="bv-modal-example" ref="modalE">
+            <Chart
+                :labels="['Янв', 'Фев', 'Март', 'Апр', 'Май','Июнь','Июль','Авг','Сент','Окт','Ноя','Дек']"
+                :datasets="this.datasets"
+            >
+            </Chart>
 
         </b-modal>
     </div>
@@ -169,16 +172,34 @@
 
 <script>
     import L from "leaflet";
-    import 'vue-chartjs'
+    //import 'vue-chartjs'
+    import Chart from './Chart'
+
+
 
     export default {
         name: "Farm",
+        components: {
+            Chart
+        },
         data(){
             return{
+
+                // for chart to draw
+                datasets: null,
+
+                // for map1
                 map2: null,
-                map3: null,
                 Esri_WorldImagery: null,
+                elemFieldLayer: null,
+
+                //for map2
+                map3: null,
                 Esri_WorldImagery2: null,
+                fieldLayer: null,
+
+
+
                 items: [
                     {
                         id: 1,
@@ -282,10 +303,10 @@
                     center: [53.5, 24.30],
                     zoom: 14,
                     // тут добавляем все нужные слои
-                    layers: [mlayer]
+                    layers: mlayer
                 });
             },
-            drawMap3() {
+            drawMap3(layer) {
                 // просто карта
                /* var mainLayer = L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiZGFyeWFjaHlydWsiLCJhIjoiY2swbzEwNnlrMDViYzNrcXI4NDAyN2gyNiJ9.d5mwHr6_wkJRtV0aXZv7Mg',
                     {
@@ -301,7 +322,7 @@
                     center: [53.54, 27.30],
                     zoom: 14,
                     // тут добавляем все нужные слои
-                    layers: [this.Esri_WorldImagery2]
+                    layers: layer
                 });
             },
 
@@ -324,64 +345,77 @@
             },
 
 
-            createChart(){
-               // this.$refs['bv-modal-example'].show();
+            createChart(label, dataArr){
 
-
-                var ctx = document.getElementById('myChart');
-                console.log('ctx', ctx);
-                /*var myChart = new Chart(ctx, {
-                    type: 'horizontalBar',
-                    data: {
-                        labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
-                        datasets: [{
-                            label: '# of Votes',
-                            data: [12, 10, 3, 5, 2, 3],
-                            backgroundColor: [
-                                'rgba(255, 99, 132, 0.2)',
-                                'rgba(54, 162, 235, 0.2)',
-                                'rgba(255, 206, 86, 0.2)',
-                                'rgba(75, 192, 192, 0.2)',
-                                'rgba(153, 102, 255, 0.2)',
-                                'rgba(255, 159, 64, 0.2)'
-                            ],
-                            borderColor: [
-                                'rgba(255, 99, 132, 1)',
-                                'rgba(54, 162, 235, 1)',
-                                'rgba(255, 206, 86, 1)',
-                                'rgba(75, 192, 192, 1)',
-                                'rgba(153, 102, 255, 1)',
-                                'rgba(255, 159, 64, 1)'
-                            ],
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        scales: {
-                            yAxes: [{
-                                ticks: {
-                                    beginAtZero: true
-                                }
-                            }]
-                        }
+                this.datasets = [
+                    {
+                        label: label,
+                        data: dataArr //[300, 700, 450, 750, 450]
                     }
-                });
+                ];
 
-*/
 
-            }
+
+                this.$refs['modalE'].show();
+
+
+
+
+
+            },
+            addPolyToLayer(dataArr, layerColor){
+                console.log(dataArr);
+                var cntr = 0;
+                var newLayer = new L.FeatureGroup();
+
+
+                    var polygon = L.polygon(dataArr, {
+                        color: layerColor,
+                        fillColor: layerColor,
+                        fillOpacity: 0.5,
+                        //id: dataArr[cntr].id,
+                        data: dataArr[cntr]
+                    });
+                    // var text = "Я полигон с id=" + dataArr[cntr].id ;
+
+                    // polygon.bindPopup(text);
+                    polygon.on('click', this.onPolygonClicked);
+                    newLayer.addLayer(polygon);
+
+                return newLayer;
+            },
         },
+
         mounted() {
             // карта типа спутник
             this.Esri_WorldImagery = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                maxZoom: 16,
             });
             // карта типа спутник
             this.Esri_WorldImagery2 = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                maxZoom: 16,
             });
 
+            var arr = [[53.509, 24.31], //[53.5, 24.30]
+                [53.503, 24.04],
+                [53.51, 24.35]];
+            var arr2 = [[52.509, 27.31],
+                [52.503, 27.04],
+                [52.51, 27.44]];
 
-            this.drawMap2(this.Esri_WorldImagery);
-            this.drawMap3();
+            // 53.54, 27.30
+
+            // layers for polygons
+            this.elemFieldLayer = this.addPolyToLayer(arr, 'red'); //[53.5, 24.30]
+
+
+            this.fieldLayer = this.addPolyToLayer(arr2, 'red');
+
+
+
+
+            this.drawMap2([this.Esri_WorldImagery, this.elemFieldLayer]);
+            this.drawMap3([this.Esri_WorldImagery2, this.fieldLayer]);
 
 
         },
