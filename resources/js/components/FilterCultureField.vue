@@ -1,31 +1,51 @@
 <template>
-    <div class="top-viewed cl-filter">
-        <h1>filter3</h1>
-        <b-col class="mt-3 mr-1 ml-1 mb-3">
-            <b-row>
-                <b-form inline>
+    <div class="top-viewed mr-3">
+        <h5 class="mt-1 ml-3">
+            Фильтр границ участков хозяйств
+        </h5>
 
-                    <b-form-select
-                        class="mb-2 mr-sm-2 mb-sm-0"
-                        v-model="chosenGround"
-                        :options="typeOfGround"
-                        id="inline-form-custom-select-pref"
-                    >
-                        <template v-slot:first>
-                            <option :value="null">Выберите вид угодий...</option>
-                        </template>
-                    </b-form-select>
+        <b-form inline>
+            <b-col class="mr-1 ml-1 mb-1">
+                <b-row class="mr-1">
+                    <b-col sm="6">
+                        <label for="inline-form-custom-select1">По виду угодий</label>
+                    </b-col>
+                    <b-col sm="6" >
+                        <b-form-select
+                            size="sm"
+                            class=" mr-sm-2 mb-sm-0 mr-1"
+                            v-model="chosenGround"
+                            :options="typeOfGround"
+                            id="inline-form-custom-select1">
 
-                    <b-form-checkbox class="mb-2 mr-sm-2 mb-sm-0">Remember my preference</b-form-checkbox>
+                            <template v-slot:first>
+                                <option :value="null">Выберите вид угодий...</option>
+                            </template>
+                        </b-form-select>
+                    </b-col>
+                </b-row>
 
-                    <b-button variant="primary">Save</b-button>
-                </b-form>
-            </b-row>
-            <b-row>
+                <b-row class="mt-1">
+                    <b-col sm="6">
+                        <label for="inline-form-custom-select2">По типу культуры</label>
+                    </b-col>
+                    <b-col sm="6">
+                        <b-form-select
+                            size="sm"
+                            class="mr-sm-2 mb-sm-0"
+                            v-model="chosenCulture"
+                            :options="cultures"
+                            id="inline-form-custom-select2"
+                        >
+                            <template v-slot:first>
+                                <option :value="null">Выберите культуру...</option>
+                            </template>
+                        </b-form-select>
+                    </b-col>
+                </b-row>
+            </b-col>
 
-            </b-row>
-        </b-col>
-
+        </b-form>
 
     </div>
 </template>

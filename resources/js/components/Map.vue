@@ -12,7 +12,11 @@
             </b-form>
         </div>
 
-        <div class="top-viewed layers-list" v-if="!this.$parent.addField">
+        <b-button class="top-viewed layers-btn" v-if="(!this.$parent.addField && !this.showLayers)" @click="showLayers = !showLayers">
+            Слои для отображения
+        </b-button>
+
+        <div class="top-viewed layers-list" v-if="(!this.$parent.addField && this.showLayers)">
             <div class="mt-2 mr-2 ml-2 mb-2">
                 <b-form-checkbox v-model="statusF1"
                                  @change="onAddFields1">
@@ -26,28 +30,39 @@
                                  @change="onAddFields3">
                     Границы участков хозяйств
                 </b-form-checkbox>
+
+                <b-row class="mt-1 mb-1 ml-2 mr-2 d-flex justify-content-between align-items-center">
+                    <b-button @click="showLayers = !showLayers">
+                        Скрыть слои
+                    </b-button>
+                    <b-button @click="showFilters = !showFilters">
+                        Фильтры
+                    </b-button>
+                </b-row>
+
             </div>
 
 
 
         </div>
 
-
-        <!--<b-modal ref="poly-modal" hide-footer title="Инструкция" id="modal-1">
-            <p class="my-4">
-                Для создания нового участка нажмите кнопку "Создать", для изменения
-            существующего участка нажмите "Изменить" и далее кликните на существующее поле.
-            </p>
-            <b-button class="mt-3" variant="outline-info" @click="createField">Создать</b-button>
-            <b-button class="mt-3" variant="outline-info" @click="hideModal">Изменить</b-button>
-        </b-modal> -->
-
         <RightMenu v-if="this.$parent.addField"></RightMenu>
         <FieldData v-if="polyPopup" :poly="polyCharacteristic"></FieldData>
 
-       <!-- <FilterBaseField v-if="statusF1"></FilterBaseField>
-        <FilterElemField v-if="statusF2"></FilterElemField>
-        <FilterCultureField v-if="statusF3"></FilterCultureField> -->
+       <!-- <FilterBaseField v-if="statusF1"></FilterBaseField> -->
+        <div class="filter-container" v-if="this.showFilters">
+            <FilterElemField v-if="(this.showFilters && this.statusF2)"></FilterElemField>
+            <FilterCultureField v-if="(this.showFilters&& this.statusF3)"></FilterCultureField>
+            <b-row class="mt-1 ml-3 mb-2"
+                   v-if="(this.showFilters && (this.statusF2 || this.statusF3))">
+                <b-button variant="primary"
+                          @click="alert('aaaaaa')">
+                    Отфильтровать данные на карте
+                </b-button>
+            </b-row>
+
+        </div>
+
 
 
     </div>
@@ -90,6 +105,9 @@ import Pagination from "bootstrap-vue/esm/mixins/pagination";
                 statusF1: false,
                 statusF2: false,
                 statusF3: false,
+
+                showLayers: false,
+                showFilters: false,
 
                 elementsFromDB:[                //тут будут данные
                     {
@@ -360,6 +378,22 @@ import Pagination from "bootstrap-vue/esm/mixins/pagination";
         position: absolute;
         background: white;
         border-radius: 5px;
+    }
+    .layers-btn{
+        top: 60px;
+        right: 10px;
+        position: absolute;
+        border-radius: 5px;
+    }
+    .filter-container {
+        position: absolute;
+        z-index: 1000;
+        top: 200px;
+        right: 10px;
+        background-color: white;
+        border-radius: 5px;
+        width: 400px
+
     }
 
 </style>

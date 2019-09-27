@@ -19,15 +19,17 @@
                         Площадь: {{poly.points[0]}}
                     </b-row>
 
-
-
-                    <b-row>
-                        Погода?????
-                    </b-row>
                 </b-col>
             </b-card-text>
 
-            <b-button @click="onChangePolygon" variant="primary">Изменить</b-button>
+            <b-row class="mt-1 mb-1 ml-2 mr-2 d-flex justify-content-between align-items-center">
+                <b-button @click="onChangePolygon" variant="primary">Подробнее</b-button>
+                <b-button @click="onChangePolygon" variant="primary">Изменить</b-button>
+                <b-button @click="onChangePolygon" variant="danger">Удалить</b-button>
+
+            </b-row>
+
+
         </b-card>
 
     </div>
